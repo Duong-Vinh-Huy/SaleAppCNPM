@@ -25,7 +25,7 @@ class Product(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(30), nullable=False, unique=True)
     price = Column(Float, default=0)
-    image = Column(String(300),
+    image = Column(String(500),
                    default='https://mega.com.vn/media/news/1025_cach_cai_hinh_nen_may_tinh_vo_cung_don_gian.jpg')
     active = Column(Boolean, default=True)
     category_id = Column(Integer,ForeignKey(Category.id), nullable=False)
