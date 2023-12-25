@@ -1,4 +1,6 @@
 function AddToCart(id, name, price){
+
+alert("asd")
     fetch('/api/cart', {
         method : 'post',
         body: JSON.stringify({
@@ -12,6 +14,8 @@ function AddToCart(id, name, price){
     }).then(function(res){
         return res.json();
     }).then(function(data) {
-        console.info(data);
+        let carts = document.getElementsByClassName("cart-counter");
+        if ( let c of carts)
+        c.innerText = data.total_quantity;
     })
 }

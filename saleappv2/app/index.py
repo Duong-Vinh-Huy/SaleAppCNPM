@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect,session, jsonify
 import dao
+import utils
 from app import app, login
 from flask_login import login_user
 
@@ -24,6 +25,17 @@ def admin_login():
         login_user(user)
     return redirect('/admin')
 
+@app.context_processor
+def common_response():
+    return {
+        'categories' : dao.get_categories(),
+        'cart' : utils.count_cart(session.get('cart'))
+    }
+
+@app.route('/cart')
+def cart():
+    return render_template('cart.html')
+
 @app.route("/api/cart", methods=["post"])
 def add_to_cart():
     data =  request.json  #lấy dữ liệu client gửi lên bằng json
@@ -44,26 +56,27 @@ def add_to_cart():
     session['cart'] = cart
     print(cart)
 
-    """
-        {
-        "1":{
-            "id":"1",
-            "name": "iphone 3",
-            "price" : 234,
-            "quantity" : 1
-        },
-        "2":{
-            "id":"2",
-            "name": "iphone 2",
-            "price" : 22234,
-            "quantity" : 1
-        }
-    """
+
     return jsonify({
         "total_amount": 0,
         "total_quantity": 0
     })
+@app.route('/api/cart/<product_id>', methods = ['put'])
+def update_cart(product_id):
+    cart = session.get('cart')
+    if cart and product_id in cart:
+        quantity = request.json.get('quantity')
+        cart[product_id]['quantity'] = int(quantity)
 
+    session['cart'] = cart
+    # return jsonify(utils.count_cart(cart))
+@app.route('/api/cart/<product_id>', methods = ['delete'])
+def delete_in_cart(product_id):
+    cart = session.get('cart')
+    if cart and product_id in cart:
+        del cart[product_id]
+
+    session['cart'] = cart
 
 
 

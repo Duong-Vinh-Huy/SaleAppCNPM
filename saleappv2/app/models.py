@@ -1,9 +1,10 @@
 import hashlib
 
-from sqlalchemy import Column, String, Integer, Float, Boolean, ForeignKey, Enum
+from sqlalchemy import Column, String, Integer, Float, Boolean, ForeignKey, Enum, DateTime
 from app import db, app
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
+from datetime import datetime
 import enum
 
 
@@ -29,6 +30,8 @@ class Product(db.Model):
                    default='https://mega.com.vn/media/news/1025_cach_cai_hinh_nen_may_tinh_vo_cung_don_gian.jpg')
     active = Column(Boolean, default=True)
     category_id = Column(Integer,ForeignKey(Category.id), nullable=False)
+    receipt_details= relationship('ReceiptDetails', backref='receipt', lazy=True)
+
     def __str__(self):
         return self.name
 
@@ -40,6 +43,28 @@ class User(db.Model, UserMixin):
     avatar= Column(String(100),
                    default='https://mega.com.vn/media/news/1025_cach_cai_hinh_nen_may_tinh_vo_cung_don_gian.jpg')
     user_role = Column(Enum(UserRoleEnum), default=UserRoleEnum.USER)
+
+    receipt = relationship('Receipt', backref='User', lazy=True)
+
+class BaseModel(db.Model):
+
+    __abstract__ = True
+    id = Column(Integer, primary_key=True)
+    activate = Column(Boolean, default=True)
+    created_date = Column(DateTime, default= datetime.now())
+
+class Receipt(BaseModel):
+    user_id = Column(Integer, ForeignKey(User.id), nullable= False)
+
+class ReceiptDetails(BaseModel):
+
+    quantity = Column(Integer, default=0)
+    price = Column(Float, default=0)
+    receipt_id = Column(Integer, ForeignKey(Receipt.id), nullable=False)
+    product_id = Column(Integer, ForeignKey(Product.id), nullable=False)
+
+
+
 
 
 
